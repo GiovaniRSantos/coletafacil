@@ -1,0 +1,18 @@
+spring:
+  main:
+    allow-bean-definition-overriding: true
+  flyway:
+    baselineOnMigrate: true
+  jpa:
+    hibernate:
+      ddl-auto: update
+  datasource:
+    url: jdbc:postgresql://127.0.0.1:5432/coletafacil?createDatabaseIfNotExist=true
+    username: postgres
+    password: admin
+
+  jackson:
+    default-property-inclusion: non_null
+
+server:
+    port: 9090

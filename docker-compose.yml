@@ -1,0 +1,23 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15
+    container_name: coletafacil
+    ports:
+      - "5436:5436"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    command: ["bash", "-c", "rm -rf /var/lib/postgresql/data/* && docker-entrypoint.sh postgres"]
+    # Definindo a versão do Debian para 10 (buster)
+    # Substitua a versão conforme necessário
+    # Consulte https://hub.docker.com/_/debian?tab=tags&page=1&ordering=last_updated&name=buster
+    # para as versões disponíveis
+    environment:
+      - POSTGRES_PASSWORD=coletaFacil@1
+      - PG_MAJOR=15
+      - PG_VERSION=15.7-1.pgdg+1
+      - DEBIAN_VERSION=buster
+
+volumes:
+  postgres-data:
