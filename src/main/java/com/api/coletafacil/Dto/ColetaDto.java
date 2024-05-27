@@ -1,40 +1,26 @@
 package com.api.coletafacil.Dto;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import jakarta.persistence.Column;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
-import org.springframework.data.annotation.Id;
+import com.api.coletafacil.models.BasedescarteModel;
+import com.api.coletafacil.models.LocalcoletaModel;
+import com.api.coletafacil.models.ResiduoModel;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import lombok.Getter;
+import lombok.Setter;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
+@Setter
+@Getter
 public class ColetaDto {
+    private Integer id;
+    private Instant dataColeta;
+    private Double quantidadeResiduo;
 
-
-
-    @NotBlank()
-    private Integer id_coleta;
-
-    @NotBlank()
-    private LocalDateTime data_coleta;
-
-    @NotBlank()
-    private Integer id_local_coleta;
-
-    @NotBlank()
-    private Integer id_residuo;
-
-    @NotBlank()
-    private Integer id_base_descarte;
-
-    @NotBlank()
-    private Float quantidade_residuo;
-
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private String observacoes;
 
-
-
+    private LocalcoletaModel idLocalColeta;
+    private ResiduoModel idResiduo;
+    private BasedescarteModel idBaseDescarte;
 
 }

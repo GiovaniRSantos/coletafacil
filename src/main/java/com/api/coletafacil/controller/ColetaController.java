@@ -1,26 +1,25 @@
 package com.api.coletafacil.controller;
 
-import com.api.coletafacil.models.ColetaModel;
+import com.api.coletafacil.Dto.ColetaDto;
 import com.api.coletafacil.service.ColetaService;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 @RestController
-@RequestMapping("/coletas")
 public class ColetaController {
 
-    final ColetaService coletaService;
+    @Autowired
+    private ColetaService coletaService;
 
-    public ColetaController(ColetaService coletaService) {
-        this.coletaService = coletaService;
-    }
+    @GetMapping("/api/coletas")
+    public List<ColetaDto> getColetas(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
 
-    @GetMapping()
-    public ResponseEntity<Page<ColetaModel>> getAll(Pageable pageable) {
-        Page<ColetaModel> coletas = coletaService.findAll(pageable);
-        return ResponseEntity.status(HttpStatus.OK).body(coletas);
+        return coletaService.findAllAsDTO(page, size);
     }
 }
