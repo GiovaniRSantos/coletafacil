@@ -1,16 +1,20 @@
 package com.api.coletafacil.controller;
 
 import com.api.coletafacil.Dto.AgendamentoColetaDto;
+import com.api.coletafacil.models.AgendamentoColetaModel;
 import com.api.coletafacil.service.AgendamentoService;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import com.api.coletafacil.service.ColetaService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 public class AgendamentosController {
 
+    @Autowired
     private final AgendamentoService agendamentoService;
 
     public AgendamentosController(AgendamentoService agendamentoService) {
@@ -24,4 +28,12 @@ public class AgendamentosController {
 
         return agendamentoService.findAllAsDTO(page, size);
     }
+
+    @PostMapping("/api/criar-agendamento")
+    public ResponseEntity<AgendamentoColetaModel> createAgendamento(@RequestBody AgendamentoColetaDto agendamentoDto) {
+        AgendamentoColetaModel novoAgendamento = agendamentoService.createAgendamento(agendamentoDto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(novoAgendamento);
+    }
+
+
 }

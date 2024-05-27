@@ -8,6 +8,7 @@ import lombok.Setter;
 
 import java.io.Serializable;
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Getter
@@ -21,7 +22,7 @@ public class ColetaModel implements Serializable {
 
     @NotNull
     @Column(name = "data_coleta", nullable = false)
-    private Instant dataColeta;
+    private LocalDateTime dataColeta;
 
     @NotNull
     @Column(name = "quantidade_residuo", nullable = false)

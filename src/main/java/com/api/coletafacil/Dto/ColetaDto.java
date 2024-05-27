@@ -8,12 +8,13 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
 
 @Setter
 @Getter
 public class ColetaDto {
     private Integer id;
-    private Instant dataColeta;
+    private LocalDateTime dataColeta;
     private Double quantidadeResiduo;
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
