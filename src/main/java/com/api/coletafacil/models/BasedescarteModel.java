@@ -1,9 +1,6 @@
 package com.api.coletafacil.models;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
@@ -18,6 +15,7 @@ public class BasedescarteModel {
     @Id
     @ColumnDefault("nextval('coletafacil.basedescarte_id_base_descarte_seq'::regclass)")
     @Column(name = "id_base_descarte", nullable = false)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
     @Size(max = 255)

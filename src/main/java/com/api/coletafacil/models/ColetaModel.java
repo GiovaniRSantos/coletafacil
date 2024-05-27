@@ -7,9 +7,8 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.io.Serializable;
-import java.time.Instant;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.Date;
 
 @Getter
 @Setter
@@ -18,6 +17,7 @@ import java.util.Date;
 public class ColetaModel implements Serializable {
     @Id
     @Column(name = "id_coleta", nullable = false)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
     @NotNull

@@ -30,9 +30,13 @@ public class AgendamentosController {
     }
 
     @PostMapping("/api/criar-agendamento")
-    public ResponseEntity<AgendamentoColetaModel> createAgendamento(@RequestBody AgendamentoColetaDto agendamentoDto) {
-        AgendamentoColetaModel novoAgendamento = agendamentoService.createAgendamento(agendamentoDto);
-        return ResponseEntity.status(HttpStatus.CREATED).body(novoAgendamento);
+    public ResponseEntity<?> createAgendamento(@RequestBody AgendamentoColetaDto agendamentoDto) {
+        try {
+            AgendamentoColetaModel novoAgendamento = agendamentoService.createAgendamento(agendamentoDto);
+            return ResponseEntity.status(HttpStatus.CREATED).body(novoAgendamento);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erro ao criar agendamento: " + e.getMessage());
+        }
     }
 
 

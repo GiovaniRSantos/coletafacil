@@ -1,14 +1,9 @@
 package com.api.coletafacil.service;
 
 import com.api.coletafacil.Dto.AgendamentoColetaDto;
-import com.api.coletafacil.models.AgendamentoColetaModel;
-import com.api.coletafacil.models.BasedescarteModel;
-import com.api.coletafacil.models.LocalcoletaModel;
-import com.api.coletafacil.models.ResiduoModel;
-import com.api.coletafacil.repositories.AgendamentoRepository;
-import com.api.coletafacil.repositories.BasedescarteRepository;
-import com.api.coletafacil.repositories.LocalcoletaRepository;
-import com.api.coletafacil.repositories.ResiduoRepository;
+import com.api.coletafacil.config.ColetaJaExistenteException;
+import com.api.coletafacil.models.*;
+import com.api.coletafacil.repositories.*;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -16,6 +11,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -34,6 +30,9 @@ public class AgendamentoService {
     @Autowired
     private BasedescarteRepository basedescarteRepository;
 
+    @Autowired
+    private ColetaRepository coletaRepository;
+
     public AgendamentoService(AgendamentoRepository agendamentoRepository) {
         this.agendamentoRepository = agendamentoRepository;
     }
@@ -49,35 +48,63 @@ public class AgendamentoService {
 
     private AgendamentoColetaDto convertToDTO(AgendamentoColetaModel agendamentoColetaModel) {
         AgendamentoColetaDto dto = new AgendamentoColetaDto();
-        dto.setDataAgendamento(agendamentoColetaModel.getDataAgendamento());
-        dto.setIdLocalColeta(agendamentoColetaModel.getIdLocalColeta().getId());
-        dto.setIdResiduo(agendamentoColetaModel.getIdResiduo().getId());
-        dto.setIdBaseDescarte(agendamentoColetaModel.getIdBaseDescarte().getId());
         dto.setObservacoes(agendamentoColetaModel.getObservacoes());
+        dto.setDataAgendamento(agendamentoColetaModel.getColeta().getDataColeta());
         return dto;
     }
 
     public AgendamentoColetaModel createAgendamento(AgendamentoColetaDto agendamentoDto) {
+
         AgendamentoColetaModel agendamentoModel = new AgendamentoColetaModel();
-        agendamentoModel.setDataAgendamento(agendamentoDto.getDataAgendamento());
+        if (agendamentoDto.getObservacoes() != null){
+            agendamentoModel.setObservacoes(agendamentoDto.getObservacoes());
+        }
 
-        // Resolver entidades pelos identificadores
-        LocalcoletaModel localColeta = localcoletaRepository.findById(agendamentoDto.getIdLocalColeta())
+
+
+        Integer idLocalColeta = agendamentoDto.getIdLocalColeta();
+        Integer idResiduo = agendamentoDto.getIdResiduo();
+        Integer idBaseDescarte = agendamentoDto.getIdBaseDescarte();
+
+
+        LocalcoletaModel localColeta = localcoletaRepository.findById(idLocalColeta)
                 .orElseThrow(() -> new EntityNotFoundException("Local de coleta não encontrado"));
-        agendamentoModel.setIdLocalColeta(localColeta);
-
-        ResiduoModel residuo = residuoRepository.findById(agendamentoDto.getIdResiduo())
+        ResiduoModel residuo = residuoRepository.findById(idResiduo)
                 .orElseThrow(() -> new EntityNotFoundException("Resíduo não encontrado"));
-        agendamentoModel.setIdResiduo(residuo);
-
-        BasedescarteModel baseDescarte = basedescarteRepository.findById(agendamentoDto.getIdBaseDescarte())
+        BasedescarteModel baseDescarte = basedescarteRepository.findById(idBaseDescarte)
                 .orElseThrow(() -> new EntityNotFoundException("Base de descarte não encontrada"));
-        agendamentoModel.setIdBaseDescarte(baseDescarte);
 
-        agendamentoModel.setQuantidade(agendamentoDto.getQuantidade());
-        agendamentoModel.setObservacoes(agendamentoDto.getObservacoes());
+
+        ColetaModel coletaModel = new ColetaModel();
+
+        List<ColetaModel> coletasCriadas = coletaRepository.findAll();
+
+        coletasCriadas.forEach(coleta -> {
+            if (coleta.getDataColeta().isEqual(agendamentoDto.getDataAgendamento())) {
+                throw new ColetaJaExistenteException("Já existe uma coleta para esta data de agendamento.");
+            }
+        });
+
+        coletaModel.setDataColeta(agendamentoDto.getDataAgendamento());
+
+
+
+        coletaModel.setQuantidadeResiduo(Double.valueOf(agendamentoDto.getQuantidade()));
+        if (agendamentoDto.getObservacoes() != null){
+            coletaModel.setObservacoes(agendamentoDto.getObservacoes());
+        }
+        coletaModel.setIdLocalColeta(localColeta);
+        coletaModel.setIdResiduo(residuo);
+        coletaModel.setIdBaseDescarte(baseDescarte);
+        coletaModel = coletaRepository.save(coletaModel);
+
+        agendamentoModel.setColeta(coletaModel);
 
         return agendamentoRepository.save(agendamentoModel);
     }
+
+
+
+
 
 }
