@@ -50,22 +50,24 @@ public class AgendamentoService {
         AgendamentoColetaDto dto = new AgendamentoColetaDto();
         dto.setObservacoes(agendamentoColetaModel.getObservacoes());
         dto.setDataAgendamento(agendamentoColetaModel.getColeta().getDataColeta());
+        dto.setStatus(agendamentoColetaModel.getStatus());
         return dto;
     }
 
     public AgendamentoColetaModel createAgendamento(AgendamentoColetaDto agendamentoDto) {
 
         AgendamentoColetaModel agendamentoModel = new AgendamentoColetaModel();
-        if (agendamentoDto.getObservacoes() != null){
+        if (agendamentoDto.getObservacoes() != null) {
             agendamentoModel.setObservacoes(agendamentoDto.getObservacoes());
         }
-
 
 
         Integer idLocalColeta = agendamentoDto.getIdLocalColeta();
         Integer idResiduo = agendamentoDto.getIdResiduo();
         Integer idBaseDescarte = agendamentoDto.getIdBaseDescarte();
+        agendamentoModel.setStatus(StatusAgendamento.Ativo);
 
+        agendamentoDto.setStatus(agendamentoDto.getStatus());
 
         LocalcoletaModel localColeta = localcoletaRepository.findById(idLocalColeta)
                 .orElseThrow(() -> new EntityNotFoundException("Local de coleta não encontrado"));
@@ -79,18 +81,23 @@ public class AgendamentoService {
 
         List<ColetaModel> coletasCriadas = coletaRepository.findAll();
 
+        List<AgendamentoColetaModel> agendamentos = agendamentoRepository.findAll();
+
+
         coletasCriadas.forEach(coleta -> {
-            if (coleta.getDataColeta().isEqual(agendamentoDto.getDataAgendamento())) {
-                throw new ColetaJaExistenteException("Já existe uma coleta para esta data de agendamento.");
-            }
+            agendamentos.forEach(agendamento -> {
+                if (agendamento.getStatus() == StatusAgendamento.Ativo && agendamento.getColeta().getDataColeta().isEqual(agendamentoDto.getDataAgendamento())
+                ) {
+                    throw new ColetaJaExistenteException("Já existe um agendamento ativo para essa coleta");
+                }
+            });
         });
+
 
         coletaModel.setDataColeta(agendamentoDto.getDataAgendamento());
 
-
-
         coletaModel.setQuantidadeResiduo(Double.valueOf(agendamentoDto.getQuantidade()));
-        if (agendamentoDto.getObservacoes() != null){
+        if (agendamentoDto.getObservacoes() != null) {
             coletaModel.setObservacoes(agendamentoDto.getObservacoes());
         }
         coletaModel.setIdLocalColeta(localColeta);
@@ -102,9 +109,6 @@ public class AgendamentoService {
 
         return agendamentoRepository.save(agendamentoModel);
     }
-
-
-
 
 
 }
